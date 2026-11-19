@@ -1,6 +1,5 @@
 import streamlit as st
 import tensorflow as tf
-import random
 from PIL import Image, ImageOps
 import numpy as np
 
@@ -75,13 +74,21 @@ if file is None:
 else:
     image = Image.open(file)
     st.image(image, use_column_width=True)
+
     predictions = import_and_predict(image, model)
-    x = random.randint(98,99)+ random.randint(0,99)*0.01
-    st.sidebar.error("Accuracy : " + str(x) + " %")
 
-    class_names = ['Anthracnose', 'Bacterial Canker','Cutting Weevil','Die Back','Gall Midge','Healthy','Powdery Mildew','Sooty Mould']
+    class_names = [
+        'Anthracnose', 'Bacterial Canker', 'Cutting Weevil',
+        'Die Back', 'Gall Midge', 'Healthy',
+        'Powdery Mildew', 'Sooty Mould'
+    ]
 
-    string = "Detected Disease : " + class_names[np.argmax(predictions)]
+    predicted_index = int(np.argmax(predictions[0]))
+    predicted_class = class_names[predicted_index]
+    confidence = float(predictions[0][predicted_index]) * 100
+    st.sidebar.info(f"Prediction Confidence: {confidence:.2f}%")
+    string = "Detected Disease : " + predicted_class
+
     if class_names[np.argmax(predictions)] == 'Healthy':
         st.balloons()
         st.sidebar.success(string)
